@@ -1,0 +1,71 @@
+clc; clear; close all;
+%=======================================================
+% MATLAB HW #4
+% Name: Nouh Shaikh
+% Date: 04/07/2025
+%=======================================================
+
+% Parameters
+m = 2;              % Mass (kg)
+v0 = 5;             % Initial speed (m/s)
+theta = 30;         % Throw angle (degrees)
+h = 2;              % Initial height (m)
+e = 0.9;            % Coefficient of restitution
+dt = 0.001;         % Time step (s)
+g = 9.81;           % Gravity (m/s^2)
+
+% Initial velocity components
+vx = v0 * cosd(theta);
+vy = v0 * sind(theta);
+
+% Initial position
+x = 0;
+y = h;
+
+% Set up figure and axes
+fig = figure('Color','w');
+ax = axes('Parent', fig);
+axis([0 25 0 h + 1])
+axis manual
+grid on
+xlabel('X (m)')
+ylabel('Y (m)')
+title('Simple Bouncing Ball Simulation')
+
+% Create animated dotted trail line
+trail = animatedline(ax, 'Color', 'b', 'LineWidth', 1.5, 'LineStyle', '--');
+
+% Create the ball marker
+hold on
+ball = plot(ax, x, y, 'ro', 'MarkerFaceColor', 'r', 'MarkerSize', 10);
+
+% Create time text display (top-right corner of the plot)
+timeLabel = text(8, h + 0.6, sprintf('Time: %.2f s', 0), ...
+    'FontSize', 12, 'Color', 'k', 'FontWeight', 'bold');
+
+% Simulation loop
+t = 0;
+while ishandle(fig) && t < 10
+    % Update physics
+    x = x + vx * dt;
+    vy = vy - g * dt;
+    y = y + vy * dt;
+
+    % Bounce condition
+    if y <= 0
+        y = 0;
+        vy = -vy * e;
+        if abs(vy) < 0.1
+            break
+        end
+    end
+
+    % Update graphics
+    addpoints(trail, x, y);                     
+    set(ball, 'XData', x, 'YData', y);          
+    set(timeLabel, 'String', sprintf('Time: %.2f s', t)); 
+    drawnow limitrate;
+    pause(0.0005);  
+
+    t = t + dt;
+end
